@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
+import dj_database_url
+import os
 
 import os
 from pathlib import Path
@@ -78,6 +80,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
+        'default': dj_database_url.parse(os.environ.get("DATABASE_URL")),
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.getenv('POSTGRES_DB', 'prompt_db'),
         'USER': os.getenv('POSTGRES_USER', 'postgres'),
