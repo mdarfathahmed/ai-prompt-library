@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" ng-app="promptLibraryApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Prompt Library</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body ng-controller="PromptController as vm">
+  <main class="container">
+    <header class="header">
+      <h1>AI Prompt Library</h1>
+      <p>A Secure Prompt Management System</p>
+    </header>
+
+    <nav class="navbar">
+      <a href="#!/prompts" ng-class="{active: vm.isActive('/prompts')}">Show All Prompts</a>
+      <a href="#!/prompt-by-id" ng-class="{active: vm.isActive('/prompt-by-id')}">Get Prompt By ID</a>
+      <a href="#!/create" ng-class="{active: vm.isActive('/create')}">Create Prompt</a>
+    </nav>
+
+    <section ng-view></section>
+
+    <section class="message error" ng-if="vm.error">{{ vm.error }}</section>
+    <section class="message success" ng-if="vm.success">{{ vm.success }}</section>
+  </main>
+
+  <script type="text/ng-template" id="list-view.html">
+    <section class="card">
+      <div class="card-title-row">
+        <h2>All Prompts</h2>
+        <button class="fit-button" type="button" ng-click="vm.loadPrompts()" ng-disabled="vm.loading.list">
+          {{ vm.loading.list ? 'Refreshing...' : 'Refresh' }}
+        </button>
+      </div>
+
+      <p ng-if="!vm.prompts.length">No prompts yet.</p>
+      <ul class="prompt-list" ng-if="vm.prompts.length">
+        <li ng-repeat="prompt in vm.prompts track by prompt.id">
+          <article>
+            <h3>{{ prompt.title }}</h3>
+            <p>{{ prompt.content }}</p>
+            <small>Complexity: {{ prompt.complexity }}</small>
+            <div class="actions">
+              <button type="button" ng-click="vm.loadPromptDetail(prompt.id)" ng-disabled="vm.loading.detail">
+                View Details
+              </button>
+            </div>
+          </article>
+        </li>
+      </ul>
+    </section>
+
+    <section class="card" ng-if="vm.selectedPrompt">
+      <h2>Prompt Detail</h2>
+      <p><strong>ID:</strong> {{ vm.selectedPrompt.id }}</p>
+      <p><strong>Title:</strong> {{ vm.selectedPrompt.title }}</p>
+      <p><strong>Content:</strong> {{ vm.selectedPrompt.content }}</p>
+      <p><strong>Complexity:</strong> {{ vm.selectedPrompt.complexity }}</p>
+      <p><strong>Views:</strong> {{ vm.selectedPrompt.view_count || 0 }}</p>
+    </section>
+  </script>
+
+  <script type="text/ng-template" id="detail-view.html">
+    <section class="card">
+      <h2>Get Prompt By ID</h2>
+      <form ng-submit="vm.searchPromptById()" novalidate>
+        <label>
+          Prompt ID
+          <input type="number" ng-model="vm.detailId" min="1" placeholder="Enter prompt id" required />
+        </label>
+        <button class="fit-button" type="submit" ng-disabled="vm.loading.detail">
+          {{ vm.loading.detail ? 'Loading...' : 'Get Prompt' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="card" ng-if="vm.selectedPrompt">
+      <h2>Prompt Detail</h2>
+      <p><strong>ID:</strong> {{ vm.selectedPrompt.id }}</p>
+      <p><strong>Title:</strong> {{ vm.selectedPrompt.title }}</p>
+      <p><strong>Content:</strong> {{ vm.selectedPrompt.content }}</p>
+      <p><strong>Complexity:</strong> {{ vm.selectedPrompt.complexity }}</p>
+      <p><strong>Views:</strong> {{ vm.selectedPrompt.view_count || 0 }}</p>
+    </section>
+  </script>
+
+  <script type="text/ng-template" id="create-view.html">
+    <section class="card">
+      <h2>Create Prompt</h2>
+      <form ng-submit="vm.createPrompt()" novalidate>
+        <label>
+          Title
+          <input type="text" ng-model="vm.form.title" placeholder="Prompt title" required />
+        </label>
+
+        <label>
+          Content
+          <textarea ng-model="vm.form.content" rows="5" placeholder="Prompt content" required></textarea>
+        </label>
+
+        <label>
+          Complexity (1-10)
+          <input type="number" ng-model="vm.form.complexity" min="1" max="10" required />
+        </label>
+
+        <button type="submit" ng-disabled="vm.loading.create">{{ vm.loading.create ? 'Saving...' : 'Save Prompt' }}</button>
+      </form>
+    </section>
+  </script>
+</body>
+</html>
